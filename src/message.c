@@ -20,7 +20,7 @@ extern CURLSH *telegram_handle;
 |  Checks if a message contains a command and routes
 |  to any match.
 -----------------------------------------------------*/
-void route_message(json_t *message) {
+void answer_message(json_t *message) {
   json_t *chat_json, *id_json;
   int written_chars;
   json_int_t chat_id;

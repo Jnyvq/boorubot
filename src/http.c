@@ -17,6 +17,35 @@ extern struct curl_slist *json_headers;
     }                                                                          \
   } while (0)
 
+
+/*-----------------------------------------------------
+|  CURLOPT_WRITEFUNCTION
+-----------------------------------------------------*/
+size_t write_response(void *response, size_t size, size_t nmemb,
+                      void *write_struct) {
+  size_t real_size = size * nmemb;
+  char *old_data = NULL;
+  struct response *mem = (struct response *)write_struct;
+
+  if (mem->size) {
+    old_data = mem->data;
+    mem->data = realloc(old_data, mem->size + real_size + 1);
+  } else
+    mem->data = malloc(real_size + 1);
+
+  if (!mem->data) {
+    free(old_data);
+    mem->size = 0;
+    return 0;
+  }
+
+  memcpy(&(mem->data[mem->size]), response, real_size);
+  mem->size += real_size;
+  mem->data[mem->size] = '\0';
+
+  return real_size;
+}
+
 /*-----------------------------------------------------
 |  HTTP request wrapper.
 -----------------------------------------------------*/
@@ -57,32 +86,4 @@ struct response request(const char *url, const char *post, long timeout,
   curl_easy_cleanup(handle);
 
   return result;
-}
-
-/*-----------------------------------------------------
-|  CURLOPT_WRITEFUNCTION
------------------------------------------------------*/
-size_t write_response(void *response, size_t size, size_t nmemb,
-                      void *write_struct) {
-  size_t real_size = size * nmemb;
-  char *old_data = NULL;
-  struct response *mem = (struct response *)write_struct;
-
-  if (mem->size) {
-    old_data = mem->data;
-    mem->data = realloc(old_data, mem->size + real_size + 1);
-  } else
-    mem->data = malloc(real_size + 1);
-
-  if (!mem->data) {
-    free(old_data);
-    mem->size = 0;
-    return 0;
-  }
-
-  memcpy(&(mem->data[mem->size]), response, real_size);
-  mem->size += real_size;
-  mem->data[mem->size] = '\0';
-
-  return real_size;
 }

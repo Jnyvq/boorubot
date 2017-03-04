@@ -127,7 +127,7 @@ void *route_updates(json_t *json) {
     if (json_is_object(inline_query))
       answer_query(inline_query);
     else if (json_is_object(message))
-      route_message(message);
+      answer_message(message);
   }
 
 #ifdef THREADED

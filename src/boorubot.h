@@ -14,8 +14,6 @@ struct response {
 };
 
 void answer_query(json_t *inline_query);
-void route_message(json_t *message);
+void answer_message(json_t *message);
 struct response request(const char *url, const char *post, long timeout,
                         int use_json_headers, CURLSH *share);
-size_t write_response(void *response, size_t size, size_t nmemb,
-                      void *write_struct);

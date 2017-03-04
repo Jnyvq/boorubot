@@ -4,6 +4,3 @@ SRC=$(wildcard src/*.c)
 
 boorubot: $(SRC) src/C-Thread-Pool/thpool.c
 	$(CC) -o $@ $^ $(CFLAGS) $(DEPS) -D THREADED
-
-service: boorubot
-	sed s,_directory_,`pwd`, < "boorubot.service" > /etc/init.d/boorubot
