@@ -6,6 +6,7 @@
 
 #include <curl/curl.h>
 #include <sys/stat.h>
+#include <errno.h>
 #include <unistd.h>
 
 #define getUpdatesURL                                                          \
@@ -90,7 +91,13 @@ void init(void) {
   CREATE_SHARE_HANDLE(booru_handle);
 
 #ifdef THREADED
-  pool = thpool_init(sysconf(_SC_NPROCESSORS_ONLN));
+  long online_count = sysconf(_SC_NPROCESSORS_ONLN);
+  if (online_count == -1 || errno != 0) {
+    fprintf(stderr,
+            "Error determing number of online processors. Shutting down...\n");
+    exit(EXIT_FAILURE);
+  }
+  pool = thpool_init(online_count);
   if (!pool) {
     fputs("Error initializing threadpool. Shutting down...\n", stderr);
     exit(EXIT_FAILURE);
